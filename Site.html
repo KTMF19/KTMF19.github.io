@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cidade Iluminada - ETEC 2026</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@1.55.0"></script>
+
+  <meta name="description" content="Projeto Cidade Iluminada - Sistema de iluminação automática com Arduino e LDR, apresentado na Semana da ETEC 2026">
+
+  <link rel="icon" type="image/png" href="../semana da etec/iconepagina.png">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap');
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #100a24;
+      color: #228df8;
+      overflow-x: hidden;
+    }
+
+    .font-mono {
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Fundo Tecnológico */
+    .bg-tech-pattern {
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(42, 39, 233, 0.18) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(6, 112, 212, 0.15) 0%, transparent 40%),
+linear-gradient(to right, rgba(21, 28, 87, 0.705) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 30px 30px, 30px 30px;
+    }
+
+    /* Efeito Glassmorphism */
+    .glass-card {
+      background: rgba(167, 3, 117, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(146, 5, 139, 0.493);
+      box-shadow: 0 8px 32px 0 rgba(151, 8, 8, 0.37);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(214, 205, 69, 0.842);
+    }
+
+    /* Transições dos Slides */
+    .slide {
+      display: none;
+      opacity: 0;
+      transform: scale(0.98);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Animação do Circuito Glow */
+    .glow-cyan {
+      box-shadow: 0 0 20px rgba(212, 130, 6, 0.4);
+    }
+
+    .glow-purple {
+      box-shadow: 0 0 20px rgba(139, 75, 198, 0.3);
+    }
+
+    /* Custom Scrollbar no código */
+    pre::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    pre::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    pre::-webkit-scrollbar-thumb {
+      background: rgba(168, 85, 247, 0.4);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col bg-tech-pattern text-slate-100 select-none">
+
+  <!-- Topo: Branding da Escola / Projeto -->
+  <header class="w-full px-6 py-4 flex items-center justify-between border-b border-purple-900/30 bg-slate-950/40 backdrop-blur-md z-20">
+    <div class="flex items-center gap-3">
+      <div class="p-2 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 text-white font-bold flex items-center justify-center shadow-lg shadow-purple-500/20">
+        <i data-lucide="cpu" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold uppercase tracking-wider text-slate-200">SEMANA DA ETEC 2026</h1>
+        <p class="text-xs text-purple-400 font-medium">PROJETO - CIDADE ILUMINADA</p>
+      </div>
+    </div>
+
+    <!-- Indicador de Progresso em Slides -->
+    <div class="flex items-center gap-2 bg-slate-900/80 px-4 py-1.5 rounded-full border border-purple-500/20">
+      <span class="text-xs font-semibold text-cyan-400" id="slide-number">01</span>
+      <span class="text-xs text-slate-500">/</span>
+      <span class="text-xs text-slate-400">06</span>
+    </div>
+  </header>
+
+  <!-- Área Principal dos Slides -->
+  <main class="flex-1 relative flex items-center justify-center p-4 sm:p-8 overflow-hidden">
+
+    <!-- SLIDE 1: Capa -->
+    <div class="slide active flex-col items-center justify-center text-center max-w-4xl w-full mx-auto" id="slide-1">
+      <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-6">
+        <i data-lucide="zap" class="w-4 h-4 text-cyan-400"></i>
+        <span>Projeto de Sistemas Embarcados AOT</span>
+      </div>
+      
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-l from-white via-slate-100 to-yellow-300 ">
+        CIDADE ILUMINADA
+      </h1>
+      
+      <p class="text-lg sm:text-xl text-slate-300 max-w-2xl mb-10 font-normal leading-relaxed">
+        Sistema de iluminação à base de LEDs que simula uma rua que ilumina ao anoitecer.
+      </p>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 w-full max-w-xl text-left">
+        <div class="glass-card p-4 rounded-xl border border-purple-500/20">
+          <p class="text-xs text-purple-400 font-medium">CRIAÇÃO</p>
+          <p class="text-sm font-semibold text-slate-200 mt-0.5">Criado para a Semana da ETEC 2026</p>
+        </div>
+        <div class="glass-card p-4 rounded-xl border border-purple-500/20">
+          <p class="text-xs text-cyan-400 font-medium">COM BASE EM</p>
+          <p class="text-sm font-semibold text-slate-200 mt-0.5">Arduino Uno R3 <br> Linguagem C++</p>
+        </div>
+        <div class="glass-card p-4 rounded-xl border border-purple-500/20 col-span-2 sm:col-span-1">
+          <p class="text-xs text-purple-400 font-medium">OBJETIVO</p>
+          <p class="text-sm font-semibold text-slate-200 mt-0.5">Simular postes inteligentes de uma rua</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Ideia do Projeto -->
+    <div class="slide flex-col justify-center max-w-5xl w-full mx-auto" id="slide-2">
+      <div class="mb-6">
+        <span class="text-xs font-bold tracking-widest text-cyan-400 uppercase">01 / Conceito</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-1">Ideia do Projeto</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="glass-card p-6 rounded-2xl flex flex-col justify-between border border-purple-500/20">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-purple-400 mb-4">
+              <i data-lucide="home" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Estrutura da Maquete</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Consiste em duas casas e um galpão lado a lado em uma calçada. Em sua frente, há uma rua com postes de luz, que acendem e apagam baseado na luminosidade do ambiente.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800 flex items-center gap-2 text-xs text-purple-300">
+            <i data-lucide="recycle" class="w-4 h-4 text-emerald-400"></i>
+            <span>Feito com materiais reutilizáveis e acabamento funcional</span>
+          </div>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl flex flex-col justify-between border border-cyan-500/20">
+          <div>
+            <div class="w-10 h-10 rounded-lg bg-cyan-600/20 border border-cyan-500/40 flex items-center justify-center text-cyan-400 mb-4">
+              <i data-lucide="lightbulb" class="w-5 h-5"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Automação Luminosa</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              O objetivo principal é acionar os LEDs localizados no topo dos postes automaticamente. O acionamento ocorre assim que o sensor de luminosidade detecta que o ambiente ficou escuro.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800 flex items-center gap-2 text-xs text-cyan-300">
+            <i data-lucide="battery" class="w-4 h-4 text-emerald-400"></i>
+            <span>Economia de energia e acionamento dinâmico</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Materiais do Projeto (Eletrônica) -->
+    <div class="slide flex-col justify-center max-w-5xl w-full mx-auto" id="slide-3">
+      <div class="mb-6">
+        <span class="text-xs font-bold tracking-widest text-purple-400 uppercase">02 / Hardware</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-1">Materiais - Parte Elétrica</h2>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+        <div class="glass-card p-4 rounded-xl flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <i data-lucide="cpu" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">01 Unidade</p>
+            <p class="text-sm font-semibold text-slate-100">Arduino Uno + Cabo USB</p>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <i data-lucide="grid" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">01 Unidade</p>
+            <p class="text-sm font-semibold text-slate-100">Protoboard</p>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <i data-lucide="cable" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">28 Unidades</p>
+            <p class="text-sm font-semibold text-slate-100">Jumpers (Macho x Fêmea)</p>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <i data-lucide="cable" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">12 Unidades</p>
+            <p class="text-sm font-semibold text-slate-100">Jumpers (Macho x Macho)</p>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            <i data-lucide="sun" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">01 Unidade</p>
+            <p class="text-sm font-semibold text-slate-100">Fotoresistor (sensor de luminosidade)</p>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">07 Unidades</p>
+            <p class="text-sm font-semibold text-slate-100">Resistores</p>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 rounded-xl flex items-center gap-3 col-span-2 sm:col-span-1">
+          <div class="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <i data-lucide="lightbulb" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">06 Unidades</p>
+            <p class="text-sm font-semibold text-slate-100">LEDs Amarelos / Brancos</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Materiais da Maquete -->
+    <div class="slide flex-col justify-center max-w-5xl w-full mx-auto" id="slide-4">
+      <div class="mb-6">
+        <span class="text-xs font-bold tracking-widest text-cyan-400 uppercase">03 / Estrutura</span>
+        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-1">Materiais - Maquete</h2>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <div class="text-cyan-400 mb-2"><i data-lucide="box" class="w-6 h-6"></i></div>
+          <h3 class="font-bold text-white text-base mb-1">Isopor</h3>
+          <p class="text-xs text-slate-400">Placa da base (30cm x 40cm)</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <div class="text-purple-400 mb-2"><i data-lucide="hammer" class="w-6 h-6"></i></div>
+          <h3 class="font-bold text-white text-base mb-1">Palitos de Sorvete</h3>
+          <p class="text-xs text-slate-400">50 a 70 unidades para telhaodos</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <div class="text-cyan-400 mb-2"><i data-lucide="layers" class="w-6 h-6"></i></div>
+          <h3 class="font-bold text-white text-base mb-1">Papelão</h3>
+          <p class="text-xs text-slate-400">Estrutura das paredes</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <div class="text-purple-400 mb-2"><i data-lucide="pipette" class="w-6 h-6"></i></div>
+          <h3 class="font-bold text-white text-base mb-1">Canudos</h3>
+          <p class="text-xs text-slate-400">Postes de iluminação</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <div class="text-cyan-400 mb-2"><i data-lucide="scissors" class="w-6 h-6"></i></div>
+          <h3 class="font-bold text-white text-base mb-1">Barbante & Fios</h3>
+          <p class="text-xs text-slate-400">Simulação de fios e conexão</p>
+        </div>
+
+        <div class="glass-card p-5 rounded-2xl border border-slate-800">
+          <div class="text-emerald-400 mb-2"><i data-lucide="flower2" class="w-6 h-6"></i></div>
+          <h3 class="font-bold text-white text-base mb-1">Plantas Artificiais</h3>
+          <p class="text-xs text-slate-400">Decoração do ambiente</p>
+        </div>
+      </div>
+    </div>
+
+<!-- SLIDE 5: Tinkercad e Código -->
+<div class="slide flex-col justify-center max-w-5xl w-full mx-auto" id="slide-5">
+  <div class="mb-4">
+    <span class="text-xs font-bold tracking-widest text-purple-400 uppercase">04 / Circuito & Código</span>
+    <h2 class="text-3xl font-bold text-white mt-0.5">Projeto no Tinkercad & Código C++</h2>
+  </div>
+
+  <!-- Alterado: items-start previne que as caixas fiquem presas à mesma altura -->
+  <!-- Opcional: use grid-cols-1 md:grid-cols-12 para controlar exatamente a largura de cada lado -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+    
+    <!-- Esquerda: Imagem/Diagrama (Ocupa 7 de 12 colunas = ~58% da largura) -->
+    <div class="md:col-span-7 glass-card p-5 rounded-2xl border border-purple-500/20 flex flex-col">
+      <h3 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+        <i data-lucide="cpu" class="w-4 h-4 text-purple-400"></i> Esquema do Circuito
+      </h3>
+      
+      <!-- Container da imagem sem altura mínima fixa para não esticar -->
+      <div class="bg-slate-950/80 rounded-xl p-3 border border-slate-800 overflow-hidden flex flex-col items-center justify-center">
+
+        <img src="../semana da etec/arduino-circuito.png" alt="Circuito Arduino" class="w-full h-auto max-h-[350px] object-contain rounded-lg">
+        <span class="text-[11px] text-slate-400 mt-2">- Simulação do circuito montado no Tinkercad -</span>
+      </div>
+
+      <div class="mt-4 text-xs text-slate-400">
+        • Grupo de Jumpers (fios) realizam a ligação do LDR ao Arduino e a Board <span class="text-cyan-400 font-mono"> - PORTAS RESPECTIVAS AOS RESISTORES-</span><br>
+        • LEDs também são ligados através do mesmo método
+      </div>
+    </div>
+
+    <!-- Direita: Bloco de Código (Ocupa 5 de 12 colunas = ~42% da largura) -->
+    <div class="md:col-span-5 glass-card p-5 rounded-2xl border border-cyan-500/20 flex flex-col">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+          <i data-lucide="code" class="w-4 h-4 text-cyan-400"></i> Código C++
+        </h3>
+        <span class="text-[10px] font-mono bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded">void loop()</span>
+      </div>
+      
+      <!-- Opcional: defina a altura desejada para o bloco de código (ex: h-[280px] ou auto) -->
+      <pre class="bg-slate-950/90 p-3 rounded-xl border border-slate-800 text-xs font-mono text-slate-300 overflow-x-auto max-h-[320px] leading-relaxed"><code>int leitura=0;
+
+void setup()
+{
+    pinMode(7, OUTPUT);
+    pinMode(6, OUTPUT);
+    pinMode(2, OUTPUT);
+    pinMode(3, OUTPUT);
+    pinMode(4, OUTPUT);
+    pinMode(5, OUTPUT);
+    pinMode(A0, INPUT);
+    Serial.begin(9600);//9600bps
+}
+void loop ()
+{leitura = analogRead(A0);
+
+Serial.println(leitura);
+if(leitura < 40) { // se a luminosidade for menor que 40
+    digitalWrite(6, HIGH);
+    digitalWrite(7, HIGH);
+    digitalWrite(2, HIGH);
+    digitalWrite(3, HIGH);
+    digitalWrite(4, HIGH);
+    digitalWrite(5, HIGH);
+} else { // se não
+    digitalWrite(6, LOW); // apaga o LED
+    digitalWrite(7, LOW);
+    digitalWrite(2, LOW);
+    digitalWrite(3, LOW);
+    digitalWrite(4, LOW);
+    digitalWrite(5, LOW);
+} delay(100); // aguarda 100 milissegundos para uma nova leitura
+}
+</code></pre>
+
+      <div class="mt-4 text-xs text-slate-400 flex items-center gap-1.5">
+        <i data-lucide="info" class="w-4 h-4 text-purple-400"></i>
+        <span>Ajusta a calibração do fotoresistor no valor de corte <span class="text-cyan-400 font-mono">(40)</span>.</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+    <!-- SLIDE 6: Avaliação / QR Code -->
+    <div class="slide flex-col items-center justify-center text-center max-w-3xl w-full mx-auto" id="slide-6">
+      <div class="p-3 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 mb-4">
+        <i data-lucide="qr-code" class="w-8 h-8"></i>
+      </div>
+
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">Avalie Nosso Projeto!</h2>
+      <p class="text-slate-300 text-sm max-w-md mb-8">
+        OBRIGADO POR ACOMPANHAR O PROJETO ATÉ AQUI.<br>SE POSSÍVEL, ESCANEIE O QRCODE ABAIXO E AVALIE NOSSO PROJETO
+      </p>
+
+      <!-- Card do QR Code -->
+      <div class="glass-card p-6 rounded-3xl border border-purple-500/30 inline-flex flex-col items-center shadow-2xl relative">
+        <div class="bg-white p-4 rounded-2xl shadow-inner mb-4">
+
+<div>
+    <img src="../semana da etec/qrcode.png" alt="QR Code para avaliação do projeto">
+</div>
+        </div>
+        <span class="text-xs font-semibold text-purple-300 tracking-wider uppercase">Obrigado pela Visita!</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Rodapé: Controles de Navegação -->
+  <footer class="w-full px-6 py-4 flex items-center justify-between border-t border-purple-900/30 bg-slate-950/60 backdrop-blur-md z-20">
+    <button id="prev-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed border border-slate-700">
+      <i data-lucide="chevron-left" class="w-4 h-4"></i>
+      <span>Anterior</span>
+    </button>
+
+    <div class="flex items-center gap-1.5" id="dots-container">
+      <!-- Pontos de navegação gerados via JS -->
+    </div>
+
+    <button id="next-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white text-xs font-semibold shadow-lg shadow-purple-500/20 transition">
+      <span>Próximo</span>
+      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    </button>
+  </footer>
+
+  <script>
+    // Inicialização dos Ícones Lucide
+    lucide.createIcons();
+
+    let currentSlide = 1;
+    const totalSlides = 6;
+
+    const slideNumberEl = document.getElementById('slide-number');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const dotsContainer = document.getElementById('dots-container');
+
+    // Gerar pontos de navegação
+    for (let i = 1; i <= totalSlides; i++) {
+      const dot = document.createElement('button');
+      dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === 1 ? 'bg-cyan-400 w-6' : 'bg-slate-700 hover:bg-slate-500'}`;
+      dot.setAttribute('aria-label', `Ir para slide ${i}`);
+      dot.addEventListener('click', () => goToSlide(i));
+      dotsContainer.appendChild(dot);
+    }
+
+    function updateSlides() {
+      // Esconder todos e mostrar o atual
+      for (let i = 1; i <= totalSlides; i++) {
+        const slideEl = document.getElementById(`slide-${i}`);
+        if (i === currentSlide) {
+          slideEl.classList.add('active');
+        } else {
+          slideEl.classList.remove('active');
+        }
+      }
+
+      // Atualizar número no topo
+      slideNumberEl.textContent = currentSlide.toString().padStart(2, '0');
+
+      // Atualizar estado dos botões
+      prevBtn.disabled = currentSlide === 1;
+      
+      if (currentSlide === totalSlides) {
+        nextBtn.innerHTML = `<span>Início</span> <i data-lucide="rotate-ccw" class="w-4 h-4"></i>`;
+      } else {
+        nextBtn.innerHTML = `<span>Próximo</span> <i data-lucide="chevron-right" class="w-4 h-4"></i>`;
+      }
+      lucide.createIcons();
+
+      // Atualizar indicadores (dots)
+      Array.from(dotsContainer.children).forEach((dot, index) => {
+        if (index + 1 === currentSlide) {
+          dot.className = 'w-6 h-2.5 rounded-full bg-cyan-400 transition-all duration-300';
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-700 hover:bg-slate-500 transition-all duration-300';
+        }
+      });
+    }
+
+    function goToSlide(slideNum) {
+      currentSlide = slideNum;
+      updateSlides();
+    }
+
+    prevBtn.addEventListener('click', () => {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlides();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+      } else {
+        currentSlide = 1;
+      }
+      updateSlides();
+    });
+
+    // Navegação por teclado (Setas)
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') {
+        if (currentSlide < totalSlides) {
+          currentSlide++;
+          updateSlides();
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (currentSlide > 1) {
+          currentSlide--;
+          updateSlides();
+        }
+      }
+    });
+
+    // Inicialização
+    updateSlides();
+  </script>
+</body>
+</html>
